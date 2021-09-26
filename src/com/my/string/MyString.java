@@ -2,13 +2,15 @@ package com.my.string;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 /**
  * @author 1ommy
  * @version 21.09.2021
  */
-public class MyString {
+public class MyString implements Iterable, Iterator{
     private char[] string;
+    private int currentIndex = -1;
 
     public MyString(char[] string) {
         this.string = string;
@@ -59,8 +61,54 @@ public class MyString {
         return new MyString(string);
     }
 
+    public void map(UnaryOperator<Character> characterUnaryOperator) {
+        List<Character> list = new ArrayList<>();
+        for (char c : string) {
+            list.add(characterUnaryOperator.apply(c));
+        }
+        string = list.toString().toCharArray();
+    }
+
+    public void sort(Comparator<Character> comparator) {
+        boolean isSort;
+        char temp;
+        int offset = 0;
+        do {
+            isSort = true;
+
+            for (int i = 0; i < string.length - 1 - offset; i++) {
+                if (comparator.compare(string[i], string[i + 1]) < 0) {
+                    temp = string[i];
+                    string[i] = string[i + 1];
+                    string[i + 1] = temp;
+
+                    isSort = false;
+                }
+            }
+
+            offset++;
+        }
+        while (!isSort);
+    }
+
     @Override
     public String toString() {
         return String.valueOf(string);
+    }
+
+    @Override
+    public Iterator iterator() {
+        currentIndex = -1;
+        return this;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return currentIndex < string.length-1;
+    }
+
+    @Override
+    public Object next() {
+        return string[++currentIndex];
     }
 }
